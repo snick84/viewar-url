@@ -41,10 +41,47 @@
 
 	
 </head>
-      
-   
     <body>
 
+		
+<div id="variant-container" class="hidden">
+    <label for="variant">Variant:</label>
+    <select id="variant"></select>
+</div>
+
+<style>
+    /* Styling for the variant dropdown */
+    #variant-container {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #variant {
+        background: black;
+        color: white;
+        border: 1px solid white;
+        padding: 5px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+</style>
+
+		
 
 
         <model-viewer 
@@ -359,35 +396,40 @@ modelViewerTexture1.addEventListener("load", () => {
 
 
 <script>
-
 const modelViewerVariants = document.querySelector("model-viewer#model");
+const variantContainer = document.querySelector('#variant-container');
 const select = document.querySelector('#variant');
 
-modelViewerVariants.addEventListener('load', () => {
+// Function to populate the dropdown and show/hide the container
+function updateVariants() {
   const names = modelViewerVariants.availableVariants;
+  
+  if (names && names.length > 0) {
+    // Show the dropdown container
+    variantContainer.classList.remove('hidden');
     select.innerHTML = ''; // clear existing options
-  for (const name of names) {
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = name;
-    select.appendChild(option);
+    
+    // Populate the dropdown with variant names
+    for (const name of names) {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    }
+  } else {
+    // Hide the dropdown container if there are no variants
+    variantContainer.classList.add('hidden');
   }
-});
+}
 
-modelViewerVariants.addEventListener('model-visibility', () => {
-  select.innerHTML = ''; // clear existing options
-  const names = modelViewerVariants.availableVariants;
-  for (const name of names) {
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = name;
-    select.appendChild(option);
-  }
-});
+// Listen for both load and visibility events to ensure variants are caught
+modelViewerVariants.addEventListener('load', updateVariants);
+modelViewerVariants.addEventListener('model-visibility', updateVariants);
 
+// Switch the variant when the user makes a selection
 select.addEventListener('input', (event) => {
   modelViewerVariants.variantName = event.target.value === 'default' ? null : event.target.value;
-});      
+});
 </script>
 
 
